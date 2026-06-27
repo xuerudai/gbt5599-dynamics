@@ -72,8 +72,19 @@ python scripts/analyze_gbt5599.py \
   --percentile 99.85
 ```
 
-If the script does not match the user's filenames, column names, or case mapping, patch a copy of the script in the working project rather than changing the skill resource itself.
+For new projects with different tunnel conditions, car counts, or case names, create a JSON case config based on `references/case_config_example.json` and run:
+
+```bash
+python scripts/analyze_gbt5599.py \
+  --input-dir path/to/original_result \
+  --output-dir path/to/analysis_output \
+  --case-config path/to/case_config.json
+```
+
+The `condition` field must match the filename prefix before `_che<car number>`, such as `mycase_che1.txt`. The script still defaults to the original five-case tunnel study when `--case-config` is not supplied.
+
+If the script does not match the user's TXT block structure or column names, patch a copy of the script in the working project rather than changing the skill resource itself.
 
 ## References
 
-Read `references/workflow.md` when writing report text, adapting the method to new data, or explaining why each metric is processed this way.
+Read `references/workflow.md` when writing report text, adapting the method to new data, or explaining why each metric is processed this way. Use `references/case_config_example.json` as the template for non-default case mappings.

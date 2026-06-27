@@ -19,6 +19,16 @@ The parser expects two header lines beginning with `"time"` and tab-separated nu
 
 Use `case1`, `case3`, `case5` for tunnel-area comparisons and `case2`, `case3`, `case4` for tunnel-shape comparisons unless the user provides a different experimental design.
 
+For a new project, do not hard-code these names in prose or code. Create a config JSON following `case_config_example.json`:
+
+- `cases[].condition`: filename prefix before `_che<car number>`.
+- `cases[].case_id`: stable internal identifier used in tables and processed filenames.
+- `cases[].label`: label shown in figures and reports.
+- `cases[].detail`: human-readable condition description.
+- `case_order`: plotting and table order.
+- `car_order`: expected car labels and plotting order.
+- `area_cases` and `shape_cases`: optional comparison groups reused by the bundled plotting functions. They can contain any `case_id` values, not only area or shape studies.
+
 ## Default processing assumptions
 
 - Constant speed: 160 km/h.

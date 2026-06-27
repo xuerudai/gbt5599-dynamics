@@ -1,0 +1,43 @@
+{
+  "cases": [
+    {
+      "condition": "35m2",
+      "case_id": "case1",
+      "label": "Case 1",
+      "detail": "35 m2",
+      "group": "area"
+    },
+    {
+      "condition": "40m2_1",
+      "case_id": "case2",
+      "label": "Case 2",
+      "detail": "40 m2-1",
+      "group": "shape"
+    },
+    {
+      "condition": "40m2_2",
+      "case_id": "case3",
+      "label": "Case 3",
+      "detail": "40 m2-2",
+      "group": "area/shape"
+    },
+    {
+      "condition": "40m2_3",
+      "case_id": "case4",
+      "label": "Case 4",
+      "detail": "40 m2-3",
+      "group": "shape"
+    },
+    {
+      "condition": "45m2",
+      "case_id": "case5",
+      "label": "Case 5",
+      "detail": "45 m2",
+      "group": "area"
+    }
+  ],
+  "case_order": ["case1", "case2", "case3", "case4", "case5"],
+  "car_order": ["car1", "car2", "car3", "car4", "car5", "car6", "car7", "car8"],
+  "area_cases": ["case1", "case3", "case5"],
+  "shape_cases": ["case2", "case3", "case4"]
+}

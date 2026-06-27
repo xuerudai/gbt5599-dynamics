@@ -92,6 +92,51 @@ COLORS = {
     "case5": "#767676",
 }
 MARKERS = {"case1": "o", "case2": "s", "case3": "D", "case4": "^", "case5": "P"}
+COLOR_CYCLE = ["#0F4D92", "#42949E", "#B64342", "#9A4D8E", "#767676", "#D08B2E", "#4F7D3A", "#5A5A5A"]
+MARKER_CYCLE = ["o", "s", "D", "^", "P", "v", "X", "*"]
+
+
+def color_for_case(case: str) -> str:
+    if case not in COLORS:
+        COLORS[case] = COLOR_CYCLE[len(COLORS) % len(COLOR_CYCLE)]
+    return COLORS[case]
+
+
+def marker_for_case(case: str) -> str:
+    if case not in MARKERS:
+        MARKERS[case] = MARKER_CYCLE[len(MARKERS) % len(MARKER_CYCLE)]
+    return MARKERS[case]
+
+
+def load_case_config(path: Path) -> None:
+    """Override case mapping and comparison groups from a user JSON file."""
+    global CASE_MAP, AREA_CASES, SHAPE_CASES, CASE_ORDER, CAR_ORDER, CASE_LABEL, CASE_DETAIL
+
+    data = json.loads(path.read_text(encoding="utf-8-sig"))
+    cases = data.get("cases")
+    if not cases:
+        raise ValueError("case config must contain a non-empty 'cases' list")
+
+    parsed: dict[str, tuple[str, str, str, str]] = {}
+    case_order: list[str] = []
+    for index, case in enumerate(cases, start=1):
+        condition = str(case.get("condition") or case.get("prefix") or "").strip()
+        if not condition:
+            raise ValueError(f"case config entry {index} is missing 'condition'")
+        case_id = str(case.get("case_id") or case.get("id") or f"case{index}").strip()
+        label = str(case.get("label") or case_id).strip()
+        detail = str(case.get("detail") or condition).strip()
+        group = str(case.get("group") or case.get("category") or "").strip()
+        parsed[condition.lower()] = (case_id, label, detail, group)
+        case_order.append(case_id)
+
+    CASE_MAP = parsed
+    CASE_ORDER = list(data.get("case_order") or case_order)
+    CAR_ORDER = list(data.get("car_order") or data.get("cars") or CAR_ORDER)
+    AREA_CASES = list(data.get("area_cases") or data.get("comparison_groups", {}).get("area", []))
+    SHAPE_CASES = list(data.get("shape_cases") or data.get("comparison_groups", {}).get("shape", []))
+    CASE_LABEL = {value[0]: value[1] for value in CASE_MAP.values()}
+    CASE_DETAIL = {value[0]: value[2] for value in CASE_MAP.values()}
 
 
 @dataclass(frozen=True)
@@ -442,8 +487,8 @@ def comparison_panel(
         ax.plot(
             x,
             values,
-            color=COLORS[case],
-            marker=MARKERS[case],
+            color=color_for_case(case),
+            marker=marker_for_case(case),
             linewidth=1.6,
             markersize=4.5,
             label=CASE_LABEL[case],
@@ -837,8 +882,9 @@ def run(cfg: Config) -> None:
     processed_dir.mkdir(parents=True, exist_ok=True)
 
     files = sorted(cfg.input_dir.glob("*.txt"))
-    if len(files) != 40:
-        raise RuntimeError(f"Expected 40 TXT files, found {len(files)} in {cfg.input_dir}")
+    expected_files = len(CASE_ORDER) * len(CAR_ORDER)
+    if len(files) != expected_files:
+        raise RuntimeError(f"Expected {expected_files} TXT files, found {len(files)} in {cfg.input_dir}")
 
     summaries: list[dict] = []
     all_w_records: list[dict] = []
@@ -942,6 +988,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input-dir", type=Path, default=here / "original_result")
     parser.add_argument("--output-dir", type=Path, default=here / "analysis_output")
+    parser.add_argument(
+        "--case-config",
+        type=Path,
+        help="JSON file that overrides case mapping, car order, and comparison groups.",
+    )
     parser.add_argument("--speed-kmh", type=float, default=160.0)
     parser.add_argument("--static-wheel-load-n", type=float, default=56505.6)
     parser.add_argument("--derailment-limit", type=float, default=0.8)
@@ -954,6 +1005,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 if __name__ == "__main__":
     args = build_parser().parse_args()
+    if args.case_config:
+        load_case_config(args.case_config)
     run(
         Config(
             input_dir=args.input_dir,
