@@ -1,0 +1,4 @@
+interface:
+  display_name: "GB/T 5599 Dynamics"
+  short_description: "Process SIMPACK vehicle dynamics results against GB/T 5599."
+  default_prompt: "Use $gbt5599-dynamics to analyze SIMPACK vehicle dynamics TXT exports and produce GB/T 5599 safety and ride-quality outputs."
