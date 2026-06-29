@@ -1000,6 +1000,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--acceleration-limit", type=float, default=2.5)
     parser.add_argument("--sperling-grade1-limit", type=float, default=2.5)
     parser.add_argument("--analysis-start-s", type=float, default=5.0)
+    parser.add_argument("--spatial-step-m", type=float, default=2.0)
+    parser.add_argument("--percentile", type=float, default=99.85)
+    parser.add_argument("--filter-low-hz", type=float, default=0.4)
+    parser.add_argument("--filter-high-hz", type=float, default=40.0)
+    parser.add_argument("--sperling-window-s", type=float, default=5.0)
     return parser
 
 
@@ -1018,5 +1023,10 @@ if __name__ == "__main__":
             acceleration_limit=args.acceleration_limit,
             sperling_grade1_limit=args.sperling_grade1_limit,
             analysis_start_s=args.analysis_start_s,
+            spatial_step_m=args.spatial_step_m,
+            percentile=args.percentile,
+            filter_low_hz=args.filter_low_hz,
+            filter_high_hz=args.filter_high_hz,
+            sperling_window_s=args.sperling_window_s,
         )
     )
